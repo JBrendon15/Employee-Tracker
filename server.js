@@ -60,7 +60,7 @@ function init() {
 }
 // function to display list of all employees
 function viewEmployees() {
-    db.query(`SELECT employee.id, first_name, last_name, title, department.name AS department, salary, CONCAT(employee.first_name ,' ', employee.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id`, function (err, results) {
+    db.query(`SELECT employee1.id, employee1.first_name, employee1.last_name, title, department.name AS department, salary, CONCAT(employee2.first_name ,' ', employee2.last_name) AS manager FROM employee AS employee1 JOIN role ON employee1.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee AS employee2 ON employee1.manager_id = employee2.id`, function (err, results) {
         if(err) {
             console.log(err);
         }
@@ -112,5 +112,4 @@ app.listen(PORT, () => {
     init();
 })
 
-// 
 
