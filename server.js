@@ -74,7 +74,9 @@ function addEmployee() {
 }
 
 function updateEmployee() {
-
+    // UPDATE employee
+    // SET role_id = 3
+    // WHERE id = 5;
 }
 // function to display all roles 
 function viewRoles() {
@@ -102,10 +104,13 @@ function viewDepartments() {
 }
 
 function addDepartment() {
-    
+
 }
 
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`); 
     init();
 })
+
+// 
+

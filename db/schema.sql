@@ -4,11 +4,12 @@ CREATE DATABASE employeetracker_db;
 
 USE employeetracker_db;
 
+-- create a table for departments
 CREATE TABLE department (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(30) NOT NULL
 );
-
+-- create a table for all the roles
 CREATE TABLE role (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
@@ -18,7 +19,7 @@ CREATE TABLE role (
     REFERENCES department(id)
     ON DELETE SET NULL
 );
-
+-- create a table for the employees
 CREATE TABLE employee (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,
