@@ -101,6 +101,10 @@ function viewDepartments() {
     })
 }
 
+function addDepartment() {
+    
+}
+
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`); 
     init();
