@@ -1,3 +1,4 @@
+// import neccessary packages
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
@@ -5,10 +6,11 @@ const cTable = require('console.table');
 const inquirer = require('inquirer');
 const PORT = process.env.PORT || 3001;
 
-
+// middleware needed
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// connecting server.js to mysql databases
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -17,7 +19,7 @@ const db = mysql.createConnection(
         database: 'employeetracker_db'
     },
 );
-
+// function to take user input on what they would like to do with switch cases
 function init() {
     inquirer
         .prompt([
@@ -56,9 +58,15 @@ function init() {
             }
         })
 }
-
+// function to display list of all employees
 function viewEmployees() {
-
+    db.query(`SELECT employee.id, first_name, last_name, title, department.name AS department, salary, CONCAT(employee.first_name ,' ', employee.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id`, function (err, results) {
+        if(err) {
+            console.log(err);
+        }
+        console.table(results);
+        init();
+    });
 }
 
 function addEmployee() {
@@ -68,22 +76,29 @@ function addEmployee() {
 function updateEmployee() {
 
 }
-
+// function to display all roles 
 function viewRoles() {
     db.query('SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id', function (err, results) {
         if(err) {
-            console.log(err)
+            console.log(err);
         }
-        console.table(results)
-    })
+        console.table(results);
+        init();
+    });
 }
 
 function addRole() {
 
 }
-
+// function to view all departments
 function viewDepartments() {
-
+    db.query('SELECT name AS departments FROM department', function (err, results) {
+        if(err) {
+            console.log(err);
+        }
+        console.table(results);
+        init();
+    })
 }
 
 app.listen(PORT, () => {
