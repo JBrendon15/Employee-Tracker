@@ -88,9 +88,50 @@ function viewRoles() {
         init();
     });
 }
-
+// function to add a new role
 function addRole() {
+    let departNames = [];
+    db.query('SELECT name FROM department', function(err,results) {
+        for(let i = 0; i < results.length; i++) {
+            departNames.push(results[i].name)
+        }
+    })
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What role do you want to add?',
+                name: 'newRole'
+            },
+            {
+                type: 'number',
+                message: 'What is the salary of this role?',
+                name: 'newSalary',
+            },
+            {
+                type: 'list',
+                message: 'What department will this role be in?',
+                choices: departNames,
+                name: 'whichDepartment'
+            }
 
+        ])
+        .then((answer) => {
+            db.query(`SELECT id FROM department WHERE name = '${answer.whichDepartment}'`, function(err, results) {
+                if (err) {
+                    console.log(err);
+                }
+                let departId = results[0].id
+                db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${answer.newRole}', ${answer.newSalary}, ${departId})`, function(err, results) {
+                    if(err) {
+                        console.log(err);
+                    }
+                    console.log('successfully added')
+                    init();
+
+                })
+            })
+        })
 }
 // function to view all departments
 function viewDepartments() {
@@ -102,7 +143,7 @@ function viewDepartments() {
         init();
     })
 }
-
+// function to add a new department
 function addDepartment() {
     inquirer
         .prompt([
