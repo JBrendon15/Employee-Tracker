@@ -94,7 +94,7 @@ function addRole() {
 }
 // function to view all departments
 function viewDepartments() {
-    db.query('SELECT name AS departments FROM department', function (err, results) {
+    db.query('SELECT * FROM department', function (err, results) {
         if(err) {
             console.log(err);
         }
@@ -104,7 +104,22 @@ function viewDepartments() {
 }
 
 function addDepartment() {
-
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'What department would you like to add?',
+                name: 'newDepart'
+            }
+        ])
+        .then((answer) => {
+            db.query(`INSERT INTO department (name) VALUE ('${answer.newDepart}')`, function (err, results) {
+                if (err) {
+                    console.log(err)
+                }
+                init();
+            })
+        })
 }
 
 app.listen(PORT, () => {
