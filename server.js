@@ -224,7 +224,7 @@ function addDepartment() {
             })
         })
 }
-
+// confirms a connection is made with mysql servers and starts application
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`); 
     init();
