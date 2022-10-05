@@ -79,64 +79,111 @@ function addEmployee() {
         for(let i = 0; i < results.length; i++){
             employeesArr.push(results[i].name)
         }
-    db.query(`SELECT title FROM role`, function(err, results) {
+        db.query(`SELECT title FROM role`, function(err, results) {
+            if(err) {
+                console.log(err);
+            }
+            for(let i = 0; i < results.length; i++) {
+                rolesArr.push(results[i].title)
+            }
+            inquirer
+                .prompt([
+                    {
+                        type: 'input',
+                        message: `What is the employee's first name?`,
+                        name: 'newFirst'
+                    },
+                    {
+                        type: 'input',
+                        message: `What is the employee's last name?`,
+                        name: 'newLast'
+                    },
+                    {
+                        type: 'list',
+                        message: `What is the employee's role?`,
+                        choices: rolesArr,
+                        name: 'newRole'
+                    },
+                    {
+                        type: 'list',
+                        message: `Who is the employee's manager?`,
+                        choices: employeesArr,
+                        name: 'employeeManager'
+                    }
+                ])
+                .then((answer) => {
+                    db.query(`SELECT id FROM role WHERE title = '${answer.newRole}'`, 
+                    function(err,results) {
+                        if(err) {
+                            console.log(err);
+                        }
+                        let newRole = results[0].id;
+                        db.query(`SELECT id FROM employee WHERE first_name = '${answer.employeeManager.split(' ')[0]}' AND last_name = '${answer.employeeManager.split(' ')[1]}' `,
+                        function(err, results) {
+                            if(err) {
+                                console.log(err);
+                            }
+                            let newManager = results[0].id;
+                            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.newFirst}', '${answer.newLast}', ${newRole}, ${newManager})`)
+                            init();
+                        })
+                    })
+                })
+        })
+    });
+}
+// function to update an employee role
+function updateEmployee() {
+    let employees = [];
+    let roles = [];
+    db.query(`SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS name FROM employee`, function(err, results) {
         if(err) {
             console.log(err);
         }
-        for(let i = 0; i < results.length; i++) {
-            rolesArr.push(results[i].title)
+        for(let i = 0; i < results.length; i++){
+            employees.push(results[i].name)
         }
-    })
-    })
-    inquirer
-        .prompt([
-            {
-                type: 'input',
-                message: `What is the employee's first name?`,
-                name: 'newFirst'
-            },
-            {
-                type: 'input',
-                message: `What is the employee's last name?`,
-                name: 'newLast'
-            },
-            {
-                type: 'list',
-                message: `What is the employee's role?`,
-                choices: rolesArr,
-                name: 'newRole'
-            },
-            {
-                type: 'list',
-                message: `Who is the employee's manager?`,
-                choices: employeesArr,
-                name: 'employeeManager'
+        db.query(`SELECT title FROM role`, function(err, res) {
+            if(err) {
+                console.log(err);
             }
-        ])
-        .then((answer) => {
-            db.query(`SELECT id FROM role WHERE title = '${answer.newRole}'`, 
-            function(err,results) {
-                if(err) {
-                    console.log(err);
-                }
-                let newRole = results[0].id;
-                db.query(`SELECT id FROM employee WHERE first_name = '${answer.employeeManager.split(' ')[0]}' AND last_name = '${answer.employeeManager.split(' ')[1]}' `,
-                function(err, results) {
-                    if(err) {
-                        console.log(err);
+            for(let i = 0; i < res.length; i++) {
+                roles.push(res[i].title)
+            }
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        message: `Which employee would you like to update?`,
+                        choices: employees,
+                        name: 'selectedEmployee'
+                    },
+                    {
+                        type: 'list',
+                        message: `What would you like to change their role to?`,
+                        choices: roles,
+                        name: 'newRole'
                     }
-                    let newManager = results[0].id;
-                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.newFirst}', '${answer.newLast}', ${newRole}, ${newManager})`)
-                    init();
+                ])
+                .then((answers) => {
+                    db.query(`SELECT id from employee WHERE first_name = '${answers.selectedEmployee.split(' ')[0]}' AND last_name = '${answers.selectedEmployee.split(' ')[1]}'`, function(err, results) {
+                        if(err) {
+                            console.log(err);
+                        }
+                        let employeeId = results[0].id;
+                        db.query(`SELECT id from role WHERE title = '${answers.newRole}'`, function(err, results) {
+                            if(err) {
+                                console.log(err);
+                            }
+                            console.log(results)
+                            let newRoleId = results[0].id;
+                            db.query(`UPDATE employee SET role_id = ${newRoleId} WHERE id = ${employeeId}`)
+                            init();
+                        })
+                    })
                 })
-            })
         })
-}
-
-function updateEmployee() {
-    // UPDATE employee
-    // SET role_id = 3
-    // WHERE id = 5;
+    });
 }
 // function to display all roles 
 function viewRoles() {
