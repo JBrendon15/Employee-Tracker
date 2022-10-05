@@ -68,9 +68,69 @@ function viewEmployees() {
         init();
     });
 }
-
+// function to add an employee
 function addEmployee() {
-    
+    let employeesArr = [];
+    let rolesArr = [];
+    db.query(`SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS name FROM employee`, function(err, results) {
+        if(err) {
+            console.log(err);
+        }
+        for(let i = 0; i < results.length; i++){
+            employeesArr.push(results[i].name)
+        }
+    db.query(`SELECT title FROM role`, function(err, results) {
+        if(err) {
+            console.log(err);
+        }
+        for(let i = 0; i < results.length; i++) {
+            rolesArr.push(results[i].title)
+        }
+    })
+    })
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: `What is the employee's first name?`,
+                name: 'newFirst'
+            },
+            {
+                type: 'input',
+                message: `What is the employee's last name?`,
+                name: 'newLast'
+            },
+            {
+                type: 'list',
+                message: `What is the employee's role?`,
+                choices: rolesArr,
+                name: 'newRole'
+            },
+            {
+                type: 'list',
+                message: `Who is the employee's manager?`,
+                choices: employeesArr,
+                name: 'employeeManager'
+            }
+        ])
+        .then((answer) => {
+            db.query(`SELECT id FROM role WHERE title = '${answer.newRole}'`, 
+            function(err,results) {
+                if(err) {
+                    console.log(err);
+                }
+                let newRole = results[0].id;
+                db.query(`SELECT id FROM employee WHERE first_name = '${answer.employeeManager.split(' ')[0]}' AND last_name = '${answer.employeeManager.split(' ')[1]}' `,
+                function(err, results) {
+                    if(err) {
+                        console.log(err);
+                    }
+                    let newManager = results[0].id;
+                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answer.newFirst}', '${answer.newLast}', ${newRole}, ${newManager})`)
+                    init();
+                })
+            })
+        })
 }
 
 function updateEmployee() {
@@ -92,6 +152,9 @@ function viewRoles() {
 function addRole() {
     let departNames = [];
     db.query('SELECT name FROM department', function(err,results) {
+        if(err){
+            console.log(err);
+        }
         for(let i = 0; i < results.length; i++) {
             departNames.push(results[i].name)
         }
@@ -128,7 +191,6 @@ function addRole() {
                     }
                     console.log('successfully added')
                     init();
-
                 })
             })
         })
