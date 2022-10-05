@@ -54,7 +54,10 @@ function init() {
                     addDepartment();
                     break;
                 case 'Quit':
-                    break;
+                    console.log('Goodbye!');
+                    // googled how to exit out of a running script in nodejs
+                    process.exit();
+                    
             }
         })
 }
