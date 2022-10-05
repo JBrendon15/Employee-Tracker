@@ -178,7 +178,6 @@ function updateEmployee() {
                             if(err) {
                                 console.log(err);
                             }
-                            console.log(results)
                             let newRoleId = results[0].id;
                             db.query(`UPDATE employee SET role_id = ${newRoleId} WHERE id = ${employeeId}`)
                             init();
@@ -239,7 +238,6 @@ function addRole() {
                     if(err) {
                         console.log(err);
                     }
-                    console.log('successfully added')
                     init();
                 })
             })
